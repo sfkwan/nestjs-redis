@@ -1,0 +1,22 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Debug NestJS Framework",
+      "args": ["${workspaceFolder}/src/main.ts"], // Adjust if your entry file is different
+      "runtimeArgs": [
+        "-r",
+        "ts-node/register",
+        "-r",
+        "tsconfig-paths/register"
+      ],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "envFile": "${workspaceFolder}/.env", // Optional: if you use environment variables
+      "skipFiles": ["<node_internals>/**", "node_modules/**"]
+    }
+  ]
+}
