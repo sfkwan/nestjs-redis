@@ -3,6 +3,7 @@ import {
   IsEnum,
   IsNotEmpty,
   IsNumber,
+  IsOptional,
   IsString,
   Max,
   Min,
@@ -20,6 +21,7 @@ class EnvironmentVariables {
   @IsEnum(Environment)
   NODE_ENV: Environment;
 
+  @IsOptional()
   @IsNumber()
   @Min(0)
   @Max(65535)
@@ -29,6 +31,7 @@ class EnvironmentVariables {
   @IsNotEmpty()
   REDIS_HOST: string;
 
+  @IsOptional()
   @IsNumber()
   @Min(0)
   @Max(65535)
