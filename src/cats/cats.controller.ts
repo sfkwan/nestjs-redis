@@ -18,7 +18,7 @@ import { Roles } from '../roles/roles.decorator';
 import { Public } from '../auth/public';
 
 import { Logger } from 'winston';
-import { WINSTON_MODULE_PROVIDER } from 'nest-winston/dist/winston.constants';
+import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { CacheService } from '../cache/cache.service';
 import { LoggingInterceptor } from '../logging/logging.interceptor';
 import { CustomCacheInterceptor } from '../custom-cache/custom-cache.interceptor';
@@ -43,7 +43,7 @@ export class CatsController {
   @Get()
   @Public()
   @UseInterceptors(CustomCacheInterceptor)
-  findAll() {
+  async findAll() {
     this.logger.info('Inside findAll method of CatsController');
     // const cacheKey = `cats:all`;
 
@@ -54,7 +54,7 @@ export class CatsController {
     //   return data;
     // }
 
-    const cats = this.catsService.findAll();
+    const cats = await this.catsService.findAll();
 
     // await this.cacheService.set(cacheKey, cats, 600);
 
@@ -73,7 +73,7 @@ export class CatsController {
       return data;
     }
 
-    const cat = this.catsService.findOne(+id);
+    const cat = await this.catsService.findOne(+id);
     await this.cacheService.set(cacheKey, cat, 60);
 
     return cat;

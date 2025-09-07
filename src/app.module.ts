@@ -9,10 +9,11 @@ import { WinstonModule } from 'nest-winston';
 import * as winston from 'winston';
 import { ConfigModule } from '@nestjs/config';
 import { CustomCacheModule } from './cache/cache.module';
+import { validate } from './config/env.validation';
 
 @Module({
   imports: [
-    ConfigModule.forRoot(), // make sure you import the ConfigModule first like this
+    ConfigModule.forRoot({ isGlobal: true, validate }), // make sure you import the ConfigModule first like this
 
     CatsModule,
     AuthModule,

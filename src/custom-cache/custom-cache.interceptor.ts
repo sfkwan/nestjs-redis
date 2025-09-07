@@ -6,8 +6,8 @@ import {
   NestInterceptor,
 } from '@nestjs/common';
 import { Observable, of, from } from 'rxjs';
-import { mergeMap, map } from 'rxjs/operators';
-import { Request } from 'express';
+import { mergeMap, map, tap } from 'rxjs/operators';
+import { Request, Response } from 'express';
 import { CacheService } from '../cache/cache.service';
 import { Logger } from 'winston';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
@@ -23,12 +23,16 @@ export class CustomCacheInterceptor implements NestInterceptor {
     next: CallHandler,
   ): Promise<Observable<unknown>> {
     const request = context.switchToHttp().getRequest<Request>();
+    const response = context.switchToHttp().getResponse<Response>();
+    const start = Date.now();
     const cacheKey = `${request.method} ${request.url}`;
 
     // read from cache (typed) — if cache read fails, fall back to request handling
     try {
       const cached = await this.cacheService.get<string>(cacheKey);
       if (cached) {
+        const duration = Date.now() - start;
+        response.setHeader('Server-Timing', `cache;dur=${duration}`);
         return of(cached);
       }
     } catch (err) {
@@ -37,14 +41,14 @@ export class CustomCacheInterceptor implements NestInterceptor {
       // console.error can be noisy; rely on centralized logger if needed
     }
 
-    return next
-      .handle()
-      .pipe(
-        mergeMap((data: unknown) =>
-          from(this.cacheService.set(cacheKey, data, 300)).pipe(
-            map(() => data),
-          ),
-        ),
-      );
+    return next.handle().pipe(
+      mergeMap((data: unknown) =>
+        from(this.cacheService.set(cacheKey, data, 300)).pipe(map(() => data)),
+      ),
+      tap(() => {
+        const duration = Date.now() - start;
+        response.setHeader('Server-Timing', `total;dur=${duration}`);
+      }),
+    );
   }
 }

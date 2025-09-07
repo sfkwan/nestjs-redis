@@ -14,17 +14,18 @@ export class CatsService {
     return 'This action adds a new cat';
   }
 
-  findAll() {
+  async findAll() {
     this.logger.info('Fetching all cats with simulated delay...');
     const currentDate: string = new Date().toLocaleString();
 
-    // await new Promise((resolve) => setTimeout(resolve, 5000));
+    await new Promise((resolve) => setTimeout(resolve, 3000));
 
     return `This action returns all cats  ${currentDate}`;
   }
 
-  findOne(id: number) {
+  async findOne(id: number) {
     this.logger.info(`Fetching cats with id ${id}`);
+    await new Promise((resolve) => setTimeout(resolve, 3000));
     const currentDate: string = new Date().toLocaleString();
     return `This action returns a #${id} cat with timestamp ${currentDate}`;
   }
