@@ -8,14 +8,16 @@ import {
 import { Observable, of, from } from 'rxjs';
 import { mergeMap, map, tap } from 'rxjs/operators';
 import { Request, Response } from 'express';
-import { CacheService } from '../cache/cache.service';
 import { Logger } from 'winston';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 
 @Injectable()
 export class CustomCacheInterceptor implements NestInterceptor {
   constructor(
-    private readonly cacheService: CacheService,
+    @Inject(CACHE_MANAGER)
+    private readonly cacheManager: Cache,
     @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
   ) {}
   async intercept(
@@ -29,7 +31,7 @@ export class CustomCacheInterceptor implements NestInterceptor {
 
     // read from cache (typed) — if cache read fails, fall back to request handling
     try {
-      const cached = await this.cacheService.get<string>(cacheKey);
+      const cached = await this.cacheManager.get<string>(cacheKey);
       if (cached) {
         const duration = Date.now() - start;
         response.setHeader('Server-Timing', `cache;dur=${duration}`);
@@ -43,7 +45,9 @@ export class CustomCacheInterceptor implements NestInterceptor {
 
     return next.handle().pipe(
       mergeMap((data: unknown) =>
-        from(this.cacheService.set(cacheKey, data, 300)).pipe(map(() => data)),
+        from(this.cacheManager.set(cacheKey, data, 60000)).pipe(
+          map(() => data),
+        ),
       ),
       tap(() => {
         const duration = Date.now() - start;

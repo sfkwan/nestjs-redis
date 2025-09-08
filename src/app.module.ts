@@ -7,26 +7,34 @@ import { UsersModule } from './users/users.module';
 
 import { WinstonModule } from 'nest-winston';
 import * as winston from 'winston';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CustomCacheModule } from './cache/cache.module';
 import { validate } from './config/env.validation';
+import { CacheModule } from '@nestjs/cache-manager';
+import { createKeyv } from '@keyv/redis';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true, validate }), // make sure you import the ConfigModule first like this
+    CacheModule.registerAsync({
+      isGlobal: true,
+      useFactory: (configService: ConfigService) => {
+        const redisHost =
+          configService.get<string>('REDIS_HOST') || 'localhost';
+        const redisPort = configService.get<number>('REDIS_PORT') || 6379;
+        return {
+          stores: [createKeyv(`redis://${redisHost}:${redisPort}`)],
+          ttl: 600000, // 10 minutes
+        };
+      },
+      inject: [ConfigService],
+    }),
+    CatsModule,
+    AuthModule,
 
     CatsModule,
     AuthModule,
     UsersModule,
-    // CacheModule.register({ ttl: 300, max: 1000, isGlobal: true }),
-    // CacheModule.registerAsync({
-    //   isGlobal: true,
-    //   useFactory: () => {
-    //     return {
-    //       stores: [new KeyvRedis('redis://localhost:6379')],
-    //     };
-    //   },
-    // }),
     WinstonModule.forRoot({
       // Configure your Winston transports and formats here
       transports: [
