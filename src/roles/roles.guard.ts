@@ -5,7 +5,6 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-// TODO: Replace with your actual JWT secret import
 import { Request } from 'express';
 import { Reflector } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
@@ -56,8 +55,10 @@ export class RolesGuard implements CanActivate {
         return true;
       }
 
-      // const request = context.switchToHttp().getRequest();
-      const user = request.user;
+      const user = request.user as UserExceptPassword;
+      // if (!user.roles || !Array.isArray(user.roles)) {
+      //   return false;
+      // }
       return user.roles.some((role) => roles.includes(role));
     } catch {
       throw new UnauthorizedException();

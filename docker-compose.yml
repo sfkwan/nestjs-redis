@@ -1,4 +1,3 @@
-version: '3.8'
 services:
   redis:
     image: redis/redis-stack:7.4.0-v6
@@ -10,6 +9,22 @@ services:
       - redis_data:/data
     restart: unless-stopped
 
+  mysql:
+    image: mysql:9.4.0
+    container_name: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: nestjs_app
+      MYSQL_USER: nestjs_user
+      MYSQL_PASSWORD: nestjs_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    restart: unless-stopped
+
 volumes:
   redis_data:
+    driver: local
+  mysql_data:
     driver: local

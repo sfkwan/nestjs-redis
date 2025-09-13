@@ -5,6 +5,12 @@ import { JwtService } from '@nestjs/jwt';
 
 export class UserExceptPassword extends OmitType(User, ['password']) {}
 
+export class JwtToken {
+  username: string;
+  sub: string;
+  roles: string[];
+}
+
 @Injectable()
 export class AuthService {
   constructor(
@@ -32,5 +38,28 @@ export class AuthService {
     } else {
       throw new UnauthorizedException('Invalid credentials');
     }
+  }
+
+  async validateUser(
+    username: string,
+    pass: string,
+  ): Promise<UserExceptPassword | null> {
+    const user = await this.usersService.findOne(username);
+    if (user && user.password === pass) {
+      const { password, ...result } = user;
+      return result;
+    }
+    return null;
+  }
+
+  async login(user: UserExceptPassword) {
+    const payload = {
+      username: user.username,
+      sub: user.userId,
+      roles: user.roles,
+    };
+    return {
+      access_token: await this.jwtService.signAsync(payload),
+    };
   }
 }

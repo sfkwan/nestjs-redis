@@ -10,6 +10,7 @@ import {
   Inject,
   UseInterceptors,
 } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
 import { CatsService } from './cats.service';
 import { CreateCatDto } from './dto/create-cat.dto';
 import { UpdateCatDto } from './dto/update-cat.dto';
@@ -24,6 +25,7 @@ import { CustomCacheInterceptor } from '../custom-cache/custom-cache.interceptor
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
 
+@ApiTags('cats')
 @UseInterceptors(LoggingInterceptor)
 @UseGuards(RolesGuard)
 @Controller('cats')
@@ -38,6 +40,8 @@ export class CatsController {
 
   @Post()
   @Roles(['user'])
+  @ApiOperation({ summary: 'Create a new cat' })
+  @ApiResponse({ status: 201, description: 'Cat created successfully' })
   create(@Body() createCatDto: CreateCatDto) {
     return this.catsService.create(createCatDto);
   }
@@ -45,6 +49,8 @@ export class CatsController {
   @Get()
   @Public()
   @UseInterceptors(CustomCacheInterceptor)
+  @ApiOperation({ summary: 'Get all cats' })
+  @ApiResponse({ status: 200, description: 'List of all cats' })
   async findAll() {
     this.logger.info('Inside findAll method of CatsController');
     // const cacheKey = `cats:all`;
@@ -65,6 +71,10 @@ export class CatsController {
 
   @Get(':id')
   @Public()
+  @ApiOperation({ summary: 'Get a cat by ID' })
+  @ApiParam({ name: 'id', description: 'Cat ID' })
+  @ApiResponse({ status: 200, description: 'Cat found' })
+  @ApiResponse({ status: 404, description: 'Cat not found' })
   async findOne(@Param('id') id: string) {
     const cacheKey = `cats:${id}`;
 

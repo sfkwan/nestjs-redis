@@ -12,6 +12,8 @@ import { CustomCacheModule } from './cache/cache.module';
 import { validate } from './config/env.validation';
 import { CacheModule } from '@nestjs/cache-manager';
 import { createKeyv } from '@keyv/redis';
+import { PrismaModule } from './prisma/prisma.module';
+import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
@@ -52,6 +54,8 @@ import { createKeyv } from '@keyv/redis';
       ],
     }),
     CustomCacheModule,
+    PrismaModule,
+    UserModule,
   ],
   controllers: [AppController],
   providers: [AppService],
