@@ -4,6 +4,7 @@ import { AppService } from './app.service';
 import { CatsModule } from './cats/cats.module';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
+import { ArticlesModule } from './articles/articles.module';
 
 import { WinstonModule } from 'nest-winston';
 import * as winston from 'winston';
@@ -13,7 +14,7 @@ import { validate } from './config/env.validation';
 import { CacheModule } from '@nestjs/cache-manager';
 import { createKeyv } from '@keyv/redis';
 import { PrismaModule } from './prisma/prisma.module';
-import { UserModule } from './user/user.module';
+// import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
@@ -55,7 +56,8 @@ import { UserModule } from './user/user.module';
     }),
     CustomCacheModule,
     PrismaModule,
-    UserModule,
+    // UserModule,
+    ArticlesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

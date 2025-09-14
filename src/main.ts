@@ -15,6 +15,8 @@ async function bootstrap() {
     .addTag('cats', 'Cat management endpoints')
     .addTag('auth', 'Authentication endpoints')
     .addTag('users', 'User management endpoints')
+    .addTag('articles', 'Article management endpoints')
+
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
